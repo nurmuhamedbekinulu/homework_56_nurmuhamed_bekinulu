@@ -6,7 +6,24 @@ from django.urls import reverse
 from static.classes.static import Static
 
 
+# def add_view(request: WSGIRequest):
+#     if request.method == "GET":
+#         return render(request, 'product_create.html', context={'choices': Static.choices})
+
+#     product_data = {
+#         'name': request.POST.get('name'),
+#         'description': request.POST.get('description'),
+#         'image': request.POST.get('image'),
+#         'category': request.POST.get('category'),
+#         'product_left': request.POST.get('product_left'),
+#         'price': request.POST.get('price')
+#     }
+#     product = Product.objects.create(**product_data)
+#     return redirect('product_detail', pk=product.pk)
+
 def add_view(request: WSGIRequest):
+    errors = {}
+
     if request.method == "GET":
         return render(request, 'product_create.html', context={'choices': Static.choices})
 
@@ -18,8 +35,21 @@ def add_view(request: WSGIRequest):
         'product_left': request.POST.get('product_left'),
         'price': request.POST.get('price')
     }
-    product = Product.objects.create(**product_data)
-    return redirect('product_detail', pk=product.pk)
+
+    if not request.POST.get('name'):
+        errors['name'] = 'Данное поле обязательно к заполнению'
+    if not request.POST.get('product_left'):
+        errors['product_left'] = 'Данное поле обязательно к заполнению'
+    if not request.POST.get('price'):
+        errors['price'] = 'Данное поле обязательно к заполнению'
+    if errors:
+        return render(request, 'product_create.html',
+                      context={
+                          'errors': errors
+                      })
+    else:
+        product = Product.objects.create(**product_data)
+        return redirect('product_detail', pk=product.pk)
 
 
 def detail_view(request, pk):
@@ -34,7 +64,16 @@ def detail_view(request, pk):
 
 
 def update_view(request, pk):
+    errors = {}
+
     product = get_object_or_404(Product, pk=pk)
+    if not request.POST.get('name'):
+        errors['name'] = 'Данное поле обязательно к заполнению'
+    if not request.POST.get('product_left'):
+        errors['product_left'] = 'Данное поле обязательно к заполнению'
+    if not request.POST.get('price'):
+        errors['price'] = 'Данное поле обязательно к заполнению'
+
     if request.method == "POST":
         product.name = request.POST.get('name')
         product.description = request.POST.get('description')
@@ -42,6 +81,12 @@ def update_view(request, pk):
         product.category = request.POST.get('category')
         product.product_left = request.POST.get('product_left')
         product.price = request.POST.get('price')
+        if errors:
+            return render(request, 'product_update.html',
+                        context={
+                            'product': product,
+                            'errors': errors
+                        })
         product.save()
         return redirect('product_detail', pk=product.pk)
     return render(request, 'product_update.html', context={'product': product, 'choices': Static.choices})

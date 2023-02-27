@@ -18,3 +18,6 @@ class Product(models.Model):
         0)], null=False, blank=False, verbose_name="Остаток")
     price = models.DecimalField(validators=[MinValueValidator(
         0)], max_digits=7, decimal_places=2, null=False, blank=False, verbose_name="Стоимость")
+
+    class Meta:
+        ordering = ['category', 'name']

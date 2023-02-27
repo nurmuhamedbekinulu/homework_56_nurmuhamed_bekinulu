@@ -5,7 +5,7 @@ from static.classes.static import Static
 
 
 def index_view(request: WSGIRequest):
-    products = Product.objects.all()
+    products = Product.objects.filter(product_left__gte=1)
     context = {
         'products': products,
         'choices': Static.choices
