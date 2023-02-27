@@ -24,8 +24,12 @@ def add_view(request: WSGIRequest):
 
 def detail_view(request, pk):
     product = get_object_or_404(Product, pk=pk)
+    for choice in Static.choices:
+        if choice[0] == product.category:
+            choices_category = choice[1]
     return render(request, 'product.html', context={
-        'product': product
+        'product': product,
+        'choices_category': choices_category
     })
 
 

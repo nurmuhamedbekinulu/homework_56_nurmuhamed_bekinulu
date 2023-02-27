@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.core.handlers.wsgi import WSGIRequest
 from webapp.models import Product
+from static.classes.static import Static
 
 
 def index_view(request: WSGIRequest):
     products = Product.objects.all()
     context = {
-        'products': products
+        'products': products,
+        'choices': Static.choices
     }
     return render(request, 'index.html', context=context)
